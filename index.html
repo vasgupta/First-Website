@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Company Name</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style type="text/css">
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 650px;
+        width:650px;
+          float: none;
+      }
+       /* Optional: Makes the sample page fill the window. */
+      html, body {
+        margin: 0;
+        margin-top: 0;
+      }
+        .city_image{
+            background-image: url(Images/IMG_1695.JPG);
+            }
+        #size{
+            margin: 0;
+            font-size:130%;
+        }
+        .font{
+            font-family: Bahnschrift, sans-serif;
+            font-size: 130%;
+        }
+        #logo{
+            width: 150px;
+            height: 150px;
+            background-color: #F2F5A9;
+            float:left;
+            margin-right: 20px;
+            text-align: center;
+            }
+        .button1{
+            margin-right: 10px;
+            margin-top: 10px;
+            float: left;
+            background-color: #C4F692;
+            border-style: outset;
+            font-size: 170%;
+            cursor: pointer;
+            }
+        .button2{
+            margin-top: 10px;
+            margin-right: 10px;
+            float: right;
+            background-color: #86D1DD;
+            border-style: outset;
+            font-size: 170%;
+            cursor: pointer;
+        }
+    </style>
+      <script type="text/javascript" src ="http://code.jquery.com/jquery-3.3.1.js"></script>
+  </head>
+  <body>
+      <div class="city_image">
+      <h1>
+    <center>Company Name</center>
+  </h1>
+        <div id="logo">Company Logo(To be created)</div>
+        <button class="button1" onclick='location.href="Keeper.html";' target="_blank">Keeper</button>
+        <button class="button2" onclick='location.href="About.html";' target="_blank">About</button>
+        <button class="button2" onclick='location.href="Contact.html";' target="_blank">Contact</button>
+        <button class="button2" onclick='location.href="Log in.html";' target="_blank">Log In</button>
+        <br></br>
+  <p class="font">Some Text</p>
+    <br></br>
+    <center><div id="map"></div></center>
+    </div>
+    <div id="places"></div>
+    
+    
+<br/>
+    <form>
+       <center> Date From:
+        <input type="date"></input>
+        Date To:
+        <input type="date"></input>
+        <br/>
+        </center>
+    <center>
+        <form>
+            <p id="size">Size:</p>
+            
+        <input type="radio" name="Size" value="5*5ft" checked>&ensp; <span class="font">5 * 5ft</span><br>
+            &emsp; &emsp;<input type="radio" name="Size" value="10*10ft"> <span class="font">10*10ft</span><br>
+            &emsp; &emsp;<input type="radio" name="Size" value="15*15ft"> <span class="font">15*15ft</span> 
+        </form>
+        <br/>
+        <button id="Submit">Submit</button>
+        <br/>
+        <img src="Images/canada-flag-xs.jpg" >
+    </center>
+
+    </form>
+    <script>
+     // create a variable called map
+    var map;
+    function find(latlong){
+        var request = {
+            types: ['storage'],
+            location:latlong,
+            radius:10000
+            // 10km for now
+        };
+        infowindow = new google.maps.InfoWindow();
+        places = new google.maps.places.PlacesService(map);
+        // Note to self: the correct spelling is PlacesService, 's' at the end of place and no 's' at the end of service
+        // creates a Google Maps PlacesService object, which is called on to do the search
+        places.nearbySearch(request, callback);
+    }
+    
+    
+function initMap(){
+map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 15,
+      });
+    if (navigator.geolocation) {
+         navigator.geolocation.getCurrentPosition(function (position) {
+             initialLocation = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+             map.setCenter(initialLocation);
+             // creates a marker of the user's location
+             var marker = new google.maps.Marker({
+            position: initialLocation,
+            map:map,
+            title:'Your Location'
+        });
+             // run the find function on the marker's location(the marker's location is passed to the function)
+             find(marker.getPosition());
+         }, function(error){ console.log(error)});
+        
+     }
+    // end of initMap function
+}
+    function callback(results, status, pagination){
+        // if the status is not okay, return nothing
+        if(status !== 'OK') return;
+        // if its okay, run the createMarkers function
+        createMarkers(results);
+    }
+        // creates a function that requires an array
+        // the array comes from the Google Places search request
+    function createMarkers(places){
+        var bounds = new google.maps.LatLngBounds();
+        // gives the Element Id of the previosuly created places div
+        var placesList = document.getElementById("places");
+        // creates a for loop that initializes the variables "i" and "place"
+        for(var i = 0, place; place = places[i]; i++){
+            
+            var image = {
+                url:place.icon,
+                size: new google.maps.Size(71,71),
+                origin: new google.maps.Point(0,0),
+                anchor: new google.maps.Point(17,34),
+                scaledSize: new google.maps.Size(25,25)
+            };
+            var marker = new google.maps.Marker({
+                map:map,
+                icon: image,
+                title: place.name,
+                position: place.geometry.location
+            });
+            var li = document.createElement('li');
+            // create an HTML object
+            li.textContent = place.name + '   ';
+            placesList.appendChild(li);
+            bounds.extend(place.geometry.location);
+        }
+        map.fitBounds(bounds);
+        // end of createMarkers function
+    }
+    // the google maps Javascript API is loaded asynchornously and uses the initMap callback function
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?libraries=places&key=
+AIzaSyByYsxs4EycWo0hRKr6deRs1A5Wo9niOZ4&callback=initMap"></script>
+  </body>
+</html>
